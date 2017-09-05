@@ -57,7 +57,7 @@ function promptID(items){
     inquirer.prompt([
         {
             name: "id",
-            message: "Enter the product ID you would like to purchase: ",
+            message: "\nEnter the product ID you would like to purchase: ",
             validate: function(id){
                 if(parseInt(id) === NaN){
                     return false;
@@ -91,7 +91,7 @@ function promptQuantity(arr) {
     inquirer.prompt([
         {
             name: "quantity",
-            message: "How many units would you want to purchase? ",
+            message: "\nHow many units would you want to purchase? ",
             validate: function(qty){
                 if(parseInt(qty) === NaN){
                     return false;
@@ -114,7 +114,8 @@ function promptQuantity(arr) {
                 if(err) throw err;
 
                 console.log("\nPurchase Completed! Thank you :)\n");
-                console.log("Updated Stock Quantity: " + newQty);
+                console.log("Updated Stock Quantity:  " + newQty);
+                console.log("Total Cost of Purchase:  $" + parsedQty*chosenItem.price + "\n");
                 setTimeout(displayProducts, 1500);
             });
             console.log(query.sql);
