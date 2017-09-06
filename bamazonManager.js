@@ -44,7 +44,7 @@ function mainPrompt() {
         } else if (result.option === "Add to Inventory"){
             addInventory();
         } else if (result.option === "Add New Product"){
-    
+            newInventory();
         } 
     });
 }
@@ -159,4 +159,49 @@ function updateAdd(items, id, qty) {
         console.log("\nUpdated Stock Quantity:  " + newQty + "\n");
         setTimeout(mainPrompt, 1500);
     });
+}
+
+function newInventory() {
+    console.log("\bAdding New Item....")
+    inquirer.prompt([
+        {
+            name: "name",
+            message: "Enter the product name you would like to add: "
+        },
+        {
+            name: "department",
+            message: "Enter the department name of your new product: "
+        },
+        {
+            name: "price",
+            message: "Enter the price of new product: ",
+            validate: function(id){
+                if(parseInt(id) === NaN){
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        },
+        {
+            name: "stock",
+            message: "Enter the stock quantity of new product: ",
+            validate: function(id){
+                if(parseInt(id) === NaN){
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+    ]).then(function(result){
+        var queryString = "insert into products set ?";
+
+        con.query(queryString, [{product_name: result.name, department_name: result.department, price: result.price, stock_quantity: result.stock}], function(err,result){
+            if (err) throw err;
+            console.log("\nNew item is successfully added into inventory\n");
+            setTimeout(mainPrompt, 1500);
+        })
+    })
+
 }
