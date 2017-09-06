@@ -41,8 +41,8 @@ function mainPrompt() {
             displayProducts();
         } else if (result.option === "View Low Inventory"){
             viewLowInventory();
-        } else if (result.option === "Add to inventory"){
-    
+        } else if (result.option === "Add to Inventory"){
+            addInventory();
         } else if (result.option === "Add New Product"){
     
         } 
@@ -55,6 +55,7 @@ function displayProducts() {
     con.query(queryString, function(err, result){
         if (err) throw err;
 
+        console.log("\nList of every available item")
         console.log("\n|------------------------------------------------------------------------------------------------------|");
         console.log("| item_id  | product_name                    | department_name       | price     | stock_quantity      |");
 
@@ -64,6 +65,7 @@ function displayProducts() {
                    + createWhiteSpace(result[i].department_name, 22) + "|" + " $" + createWhiteSpace(result[i].price, 8) + "|" + createWhiteSpace(result[i].stock_quantity, 20) + "|");
         }
         console.log("|------------------------------------------------------------------------------------------------------|\n");
+        setTimeout(mainPrompt, 1500);
     });
 }
 
@@ -86,6 +88,7 @@ function viewLowInventory() {
     con.query(queryString, function(err, result){
         if (err) throw err;
 
+        console.log("\nList of all items with an inventory count lower than five");
         console.log("\n|------------------------------------------------------------------------------------------------------|");
         console.log("| item_id  | product_name                    | department_name       | price     | stock_quantity      |");
 
@@ -95,5 +98,65 @@ function viewLowInventory() {
                    + createWhiteSpace(result[i].department_name, 22) + "|" + " $" + createWhiteSpace(result[i].price, 8) + "|" + createWhiteSpace(result[i].stock_quantity, 20) + "|");
         }
         console.log("|------------------------------------------------------------------------------------------------------|\n");
+        setTimeout(mainPrompt, 1500);
     })
+}
+
+function addInventory() {
+    inquirer.prompt([
+        {
+            name: "id",
+            message: "Enter product ID you would like to add: ",
+            validate: function(id){
+                if(parseInt(id) === NaN){
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        },
+        {
+            name: "qty",
+            message: "How much would you like to add? "
+        }
+    ]).then(function(result){
+        var queryString = "select * from products";
+        var productArr = [];
+        var isValidId = false;
+        var chosenId = parseInt(result.id);
+        var chosenQty = parseInt(result.qty);
+
+        con.query(queryString, function(err, result){
+            if(err) throw err;
+            for(var i=0; i<result.length; i++){
+                productArr.push(result[i]);
+                if (result[i].item_id === chosenId){
+                    isValidId = true;
+                }
+            }
+            
+            if (isValidId) {
+                updateAdd(productArr , chosenId, chosenQty);
+            } else {
+                console.log("\nCouldn't find the product ID from our inventory, Please Try Again\n");
+                setTimeout(mainPrompt, 1500);
+            }
+            
+        });
+    })
+}
+
+function updateAdd(items, id, qty) {
+    var productArr = items;
+    var productId = id;
+    var updateQty = qty;
+    
+    var queryString = "update products set ? where ?";
+    var newQty = productArr[productId-1].stock_quantity + updateQty;
+    var query = con.query(queryString, [{stock_quantity: newQty}, {item_id: productId}], function(err, result){
+        if (err) throw err; 
+        console.log("\nAdded " + updateQty + " " + productArr[productId-1].product_name + " to inventory!\n");
+        console.log("\nUpdated Stock Quantity:  " + newQty + "\n");
+        setTimeout(mainPrompt, 1500);
+    });
 }
