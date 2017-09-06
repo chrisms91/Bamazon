@@ -40,7 +40,7 @@ function mainPrompt() {
         if (result.option === "View Products for Sale"){
             displayProducts();
         } else if (result.option === "View Low Inventory"){
-    
+            viewLowInventory();
         } else if (result.option === "Add to inventory"){
     
         } else if (result.option === "Add New Product"){
@@ -78,4 +78,22 @@ function createWhiteSpace(item, sectionSize){
     
     var display = " " + item + new Array(spaceLength).join(" ") + " ";
     return display;
+}
+
+function viewLowInventory() {
+    var queryString = "select * from products where stock_quantity < 5";
+
+    con.query(queryString, function(err, result){
+        if (err) throw err;
+
+        console.log("\n|------------------------------------------------------------------------------------------------------|");
+        console.log("| item_id  | product_name                    | department_name       | price     | stock_quantity      |");
+
+        for(var i=0; i<result.length; i++){
+            console.log("|------------------------------------------------------------------------------------------------------|");
+            console.log("|" + createWhiteSpace(result[i].item_id, 9) + "|" + createWhiteSpace(result[i].product_name, 32) + "|" 
+                   + createWhiteSpace(result[i].department_name, 22) + "|" + " $" + createWhiteSpace(result[i].price, 8) + "|" + createWhiteSpace(result[i].stock_quantity, 20) + "|");
+        }
+        console.log("|------------------------------------------------------------------------------------------------------|\n");
+    })
 }
