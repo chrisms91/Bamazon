@@ -6,7 +6,7 @@ var con = mysql.createConnection({
     port: 3306,
     user: "root",
     password: "root",
-    database: "bamazon",
+    database: "bamazon"
 });
 con.connect(function(err) {
     if (err) throw err;
@@ -22,17 +22,18 @@ function displayProducts() {
     con.query(queryString, function(err, result){
         if (err) throw err;
 
-        console.log("|------------------------------------------------------------------------------------------------------|");
-        console.log("| item_id  | product_name                    | department_name       | price     | stock_quantity      |");
+        console.log("\n|--------------------------------------------------------------------------------------------------------------------------|");
+        console.log("| item_id  | product_name                    | department_name       | price     | stock_quantity      | product_sales     |");
 
         for(var i=0; i<result.length; i++){
             productArr.push(result[i]);
 
-            console.log("|------------------------------------------------------------------------------------------------------|");
+            console.log("|--------------------------------------------------------------------------------------------------------------------------|");
             console.log("|" + createWhiteSpace(result[i].item_id, 9) + "|" + createWhiteSpace(result[i].product_name, 32) + "|" 
-                   + createWhiteSpace(result[i].department_name, 22) + "|" + createWhiteSpace(result[i].price, 10) + "|" + createWhiteSpace(result[i].stock_quantity, 20) + "|");
+                   + createWhiteSpace(result[i].department_name, 22) + "|" + createWhiteSpace(result[i].price, 10) + "|" + createWhiteSpace(result[i].stock_quantity, 20) + "|"
+                   + createWhiteSpace(result[i].product_sales, 18) + "|");
         }
-        console.log("|------------------------------------------------------------------------------------------------------|");
+        console.log("|--------------------------------------------------------------------------------------------------------------------------|\n");
 
         promptID(productArr);
     });
@@ -109,8 +110,9 @@ function promptQuantity(arr) {
         } else {
             var queryString = "UPDATE products SET ? WHERE ?";
             var newQty = chosenItem.stock_quantity - parsedQty;
+            var newSales = chosenItem.price * parsedQty;
 
-            var query = con.query(queryString, [{stock_quantity: newQty}, {item_id: chosenItem.item_id}], function(err, result){
+            var query = con.query(queryString, [{stock_quantity: newQty, product_sales: newSales}, {item_id: chosenItem.item_id}], function(err, result){
                 if(err) throw err;
 
                 console.log("\nPurchase Completed! Thank you :)\n");
