@@ -17,6 +17,7 @@ con.connect(function(err) {
 // This function display products in database, and save product ID in array
 function displayProducts() {
     var productArr = [];
+    var departmentNameArr = [];
     var queryString = "select * from products";
 
     con.query(queryString, function(err, result){
@@ -27,7 +28,7 @@ function displayProducts() {
 
         for(var i=0; i<result.length; i++){
             productArr.push(result[i]);
-
+            
             console.log("|--------------------------------------------------------------------------------------------------------------------------|");
             console.log("|" + createWhiteSpace(result[i].item_id, 9) + "|" + createWhiteSpace(result[i].product_name, 32) + "|" 
                    + createWhiteSpace(result[i].department_name, 22) + "|" + createWhiteSpace(result[i].price, 10) + "|" + createWhiteSpace(result[i].stock_quantity, 20) + "|"

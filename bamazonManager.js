@@ -129,7 +129,6 @@ function addInventory() {
                 console.log("\nCouldn't find the product ID from our inventory, Please Try Again\n");
                 setTimeout(mainPrompt, 1500);
             }
-            
         });
     })
 }
@@ -183,13 +182,71 @@ function newInventory() {
             }
         }
     ]).then(function(result){
-        var queryString = "insert into products set ?";
+        insertProduct(result);
+    });
+}
 
-        con.query(queryString, [{product_name: result.name, department_name: result.department, price: result.price, stock_quantity: result.stock}], function(err,result){
-            if (err) throw err;
-            console.log("\nNew item is successfully added into inventory\n");
+function insertProduct(result) {
+    var queryString = "insert into products set ?";
+    console.log(result);
+    con.query(queryString, [{product_name: result.name, department_name: result.department, price: result.price, stock_quantity: result.stock}], function(err,rst){
+        if (err) throw err;
+        console.log("\nNew item is successfully added into inventory\n");
+        grabDptName(result.department);
+    });
+}
+
+function grabDptName(newDptName){
+    var dptArr = [];
+    var queryString = "select distinct department_name from departments";
+    var query = con.query(queryString, function(err, result){
+        if (err) throw err;
+        for (var i=0; i<result.length; i++){
+            dptArr.push(result[i].department_name);
+        }
+        updateDptName(dptArr, newDptName);
+    });
+}
+
+function updateDptName(dptArr, newDptName){
+    console.log("newDptName: " + newDptName);
+    console.log(dptArr);
+    var isDup = false;
+    for (var i=0; i<dptArr.length; i++){
+        if(dptArr.indexOf(newDptName) === -1){
+            isDup = true;
+        } 
+    }
+    if (isDup){
+        var queryString = "insert into departments set ?";
+        con.query(queryString, [{department_name: newDptName}]);
+        console.log("\nUpdate " + newDptName + " in departments table, please set the over_head_cost for this department \n");
+        updateDptOhc(newDptName);
+    } else {
+        setTimeout(mainPrompt, 1500);
+    }
+}
+
+function updateDptOhc(newDptName) {
+    inquirer.prompt([
+        {
+            name: "ohc",
+            message: "Enter the over_head_cost for this department: ",
+            validate: function(id){
+                if(parseInt(id) === NaN){
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+    ]).then(function(result){
+        var queryString = "update departments set ? where ?";
+        var query = con.query(queryString, [{over_head_cost: result.ohc},{department_name: newDptName}], function(err, rst){
+            if(err) throw err;
+            console.log("\n New department " + newDptName + " is added into table successfully!\n");
             setTimeout(mainPrompt, 1500);
         })
     })
-
 }
+
