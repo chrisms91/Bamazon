@@ -44,19 +44,43 @@ function viewProductSales() {
         
         console.log("\n|----------------------------------------------------------------------------------------------------|");
         console.log("| department_id  | department_name       | over_head_costs     | product_sales      | total_profit   |");
-        for (var i=0; i<dpTable.length; i++){
-            var ohc = dpTable[i].over_head_cost;
-            var ps = totalProductSales[i].product_sales;
-            var tp = ps - ohc;
+        for (var i=0; i<totalProductSales.length; i++){
+            var ohc = 0;
+            var ps = 0;
+            var tp = 0;
+
+            if(checkDeptName(dpTable[i].department_name, totalProductSales)){
+                ohc = dpTable[i].over_head_cost;
+                ps = totalProductSales[i].product_sales;
+                tp = ps - ohc;
+            } else {
+                ohc = dpTable[i].over_head_cost;
+                ps = 0;
+                tp = ps - ohc;
+            }
 
             console.log("|----------------------------------------------------------------------------------------------------|");
             console.log("|" + createWhiteSpace(dpTable[i].department_id, 15) + "|" + createWhiteSpace(dpTable[i].department_name, 22)
-                + "|" + createWhiteSpace(dpTable[i].over_head_cost, 20) + "|" + createWhiteSpace(totalProductSales[i].product_sales, 19)
+                + "|" + createWhiteSpace(dpTable[i].over_head_cost, 20) + "|" + createWhiteSpace(ps, 19)
                 + "|" + createWhiteSpace(tp, 15) + "|");
         }
         console.log("|----------------------------------------------------------------------------------------------------|");
         setTimeout(mainPrompt, 1500);
     })
+}
+
+function checkDeptName(dpName, pdTable){
+    var isInProduct = false;
+    for(var i=0; i<pdTable.length; i++){
+        if(dpName === pdTable[i].department_name){
+            isInProduct = true;
+        } 
+    }
+    if (isInProduct){
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function createDepartment() {
