@@ -55,6 +55,7 @@ function viewProductSales() {
                 + "|" + createWhiteSpace(tp, 15) + "|");
         }
         console.log("|----------------------------------------------------------------------------------------------------|");
+        setTimeout(mainPrompt, 1500);
     })
 }
 
@@ -77,13 +78,42 @@ function createDepartment() {
             }
         }
     ]).then (function(result){
+        var newDptName = result.name;
+        var ohc = result.over_head_cost;
+        grabDptName(newDptName, ohc);
+    })
+}
+
+function grabDptName(newDptName, ohc){
+    var dptArr = [];
+    var queryString = "select distinct department_name from departments";
+    var query = con.query(queryString, function(err, result){
+        if (err) throw err;
+        for (var i=0; i<result.length; i++){
+            dptArr.push(result[i].department_name);
+        }
+        updateDpt(dptArr, newDptName, ohc);
+    });
+}
+
+function updateDpt(dptArr, newDptName, ohc){
+    var isDup = false;
+    for (var i=0; i<dptArr.length; i++){
+        if(dptArr.indexOf(newDptName) === -1){
+            isDup = true;
+        } 
+    }
+    if (isDup){
         var queryString = "insert into departments set ?";
-        con.query(queryString, [{department_name: result.name, over_head_cost: result.over_head_cost}], function(err, result){
+        con.query(queryString, [{department_name: newDptName, over_head_cost: ohc}], function(err, result){
             if (err) throw err;
             console.log("\nNew department is successfully added\n");
             setTimeout(mainPrompt, 1500);
         })
-    })
+    } else {
+        console.log("\nDepartment name is already exists!")
+        setTimeout(mainPrompt, 1500);
+    }
 }
 
 //Generates empty space depends on item length.
