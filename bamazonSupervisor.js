@@ -41,24 +41,26 @@ function viewProductSales() {
         
         var dpTable = result[0];
         var totalProductSales = result[1];
-        
+
+        var ohc = 0;
+        var ps = 0;
+        var tp = 0;
+
         console.log("\n|----------------------------------------------------------------------------------------------------|");
         console.log("| department_id  | department_name       | over_head_costs     | product_sales      | total_profit   |");
-        for (var i=0; i<totalProductSales.length; i++){
-            var ohc = 0;
-            var ps = 0;
-            var tp = 0;
-
-            if(checkDeptName(dpTable[i].department_name, totalProductSales)){
-                ohc = dpTable[i].over_head_cost;
-                ps = totalProductSales[i].product_sales;
-                tp = ps - ohc;
-            } else {
-                ohc = dpTable[i].over_head_cost;
-                ps = 0;
-                tp = ps - ohc;
+        for (var i=0; i<dpTable.length; i++){
+            var isInProduct = false;
+            for (var j=0; j<totalProductSales.length; j++){
+                if(dpTable[i].department_name === totalProductSales[j].department_name){
+                    isInProduct = true;
+                    ps = totalProductSales[j].product_sales;
+                }
             }
-
+            if (!isInProduct){
+                ps = 0;
+            }
+            ohc = dpTable[i].over_head_cost;
+            tp = ps - ohc;
             console.log("|----------------------------------------------------------------------------------------------------|");
             console.log("|" + createWhiteSpace(dpTable[i].department_id, 15) + "|" + createWhiteSpace(dpTable[i].department_name, 22)
                 + "|" + createWhiteSpace(dpTable[i].over_head_cost, 20) + "|" + createWhiteSpace(ps, 19)
@@ -67,20 +69,6 @@ function viewProductSales() {
         console.log("|----------------------------------------------------------------------------------------------------|");
         setTimeout(mainPrompt, 1500);
     })
-}
-
-function checkDeptName(dpName, pdTable){
-    var isInProduct = false;
-    for(var i=0; i<pdTable.length; i++){
-        if(dpName === pdTable[i].department_name){
-            isInProduct = true;
-        } 
-    }
-    if (isInProduct){
-        return true;
-    } else {
-        return false;
-    }
 }
 
 function createDepartment() {
@@ -129,13 +117,14 @@ function updateDpt(dptArr, newDptName, ohc){
     }
     if (isDup){
         var queryString = "insert into departments set ?";
-        con.query(queryString, [{department_name: newDptName, over_head_cost: ohc}], function(err, result){
+        var query = con.query(queryString, [{department_name: newDptName, over_head_cost: ohc}], function(err, result){
             if (err) throw err;
             console.log("\nNew department is successfully added\n");
             setTimeout(mainPrompt, 1500);
         })
+        console.log(query.sql);
     } else {
-        console.log("\nDepartment name is already exists!")
+        console.log("\nDepartment name is already exists!\n")
         setTimeout(mainPrompt, 1500);
     }
 }
