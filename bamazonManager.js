@@ -188,7 +188,6 @@ function newInventory() {
 
 function insertProduct(result) {
     var queryString = "insert into products set ?";
-    console.log(result);
     con.query(queryString, [{product_name: result.name, department_name: result.department, price: result.price, stock_quantity: result.stock}], function(err,rst){
         if (err) throw err;
         console.log("\nNew item is successfully added into inventory\n");
@@ -209,8 +208,6 @@ function grabDptName(newDptName){
 }
 
 function updateDptName(dptArr, newDptName){
-    console.log("newDptName: " + newDptName);
-    console.log(dptArr);
     var isDup = false;
     for (var i=0; i<dptArr.length; i++){
         if(dptArr.indexOf(newDptName) === -1){
